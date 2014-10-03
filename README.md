@@ -1,4 +1,4 @@
-KANOPE is an Opera extension that allows you to connect for TOR.
+KANOPE is an Opera extension that create proxy settings to connect you to TOR.<br>
 KANOPE also protects you against some attacks like :
 - Referrer & History sniffing
 - User-Agent sniffing (if Javascript is disabled)
