@@ -4,8 +4,7 @@ and protects you against some attacks like :
 - User-Agent sniffing (if Javascript is disabled)
 - Tracking by third party HTTP authentication headers.
 - Some trackers (Google Analytics, AddThis, Omniture, Piwik etc...)
-- Third-party cookies<br>
-<br><br>
+- Third-party cookies
 Install the extension , follow our guide and then go to http://ip-check.info/ to see how much effective it is. <br>
 It's not perfect but it's still much better than the default configuration.  <br>
 (even if you manually disable cookies and Javascript) <br>
