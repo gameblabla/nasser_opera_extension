@@ -11,8 +11,7 @@ The only big problems are :  <br>
 - The HTTP headers order is not same as Firefox so the signature is different from TorBrowser.
 - The referer is disabled but it can break some websites.
 - An attacker can indirectly know the fonts you have installed on your PC with @font-face.
-<br>
-<br>
+
 Modifying the referer to only send the current domain needs additional code 
 <br>(and i don't know how to do this),<br>
 the signature thingy can't be solved by an extension (only by Opera or Google) 
