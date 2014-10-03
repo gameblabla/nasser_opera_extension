@@ -6,8 +6,8 @@ and protects you against some attacks like :
 - Some trackers (Google Analytics, AddThis, Omniture, Piwik etc...)
 - Third-party cookies
 
-Before you start using it , click on the Monkey and read all the instructions.
-Don't believe it ? 
+Before you start using it , click on the Monkey and read all the instructions. <br>
+Don't believe me ? 
 Install the extension , follow our guide and then go to http://ip-check.info/ to see how much effective it is.
 It's not perfect but it's still much better than the default configuration. 
 (even if you manually disable cookies and Javascript)
