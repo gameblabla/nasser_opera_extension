@@ -1,4 +1,4 @@
-NASSER is an Opera extension that creates a proxy for TOR
+KANOPE is an Opera extension that creates a proxy for TOR
 and protects you against some attacks like :
 - Referrer & History sniffing
 - User-Agent sniffing (if Javascript is disabled)
@@ -6,7 +6,6 @@ and protects you against some attacks like :
 - Some trackers (Google Analytics, AddThis, Omniture, Piwik etc...)
 - Third-party cookies<br>
 <br><br>
-Don't believe me ?  <br>
 Install the extension , follow our guide and then go to http://ip-check.info/ to see how much effective it is. <br>
 It's not perfect but it's still much better than the default configuration.  <br>
 (even if you manually disable cookies and Javascript) <br>
