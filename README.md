@@ -7,13 +7,13 @@ and protects you against some attacks like :
 - Third-party cookies
 
 Before you start using it , click on the Monkey and read all the instructions. <br>
-Don't believe me ? 
-Install the extension , follow our guide and then go to http://ip-check.info/ to see how much effective it is.
-It's not perfect but it's still much better than the default configuration. 
-(even if you manually disable cookies and Javascript)
-
-It's my first extension for any browser so i apologize if it's not well coded.
-I made this extension because no addons on https://addons.opera.com/ filled my needs.
-See it as a all-in-one privacy package  for Opera.
-
-It can be modified to work with JonDo but you will have to make yourself.
+Don't believe me ?  <br>
+Install the extension , follow our guide and then go to http://ip-check.info/ to see how much effective it is. <br>
+It's not perfect but it's still much better than the default configuration.  <br>
+(even if you manually disable cookies and Javascript) <br>
+ <br>
+It's my first extension for any browser so i apologize if it's not well coded. <br>
+I made this extension because no addons on https://addons.opera.com/ filled my needs. <br>
+See it as a all-in-one privacy package for Opera. <br>
+ <br>
+It can be modified to work with JonDo but you will have to make yourself. <br>
