@@ -19,49 +19,7 @@ under the License.
 
 var once = 0;
 var proxy_mode = 0;
-var i;
 
-/*
-
-Refer to the function Blockurl();
-
-If it finds one of the following key words in the url then it is blocked.
-This applies to every URL request.
-
-This list is needed because some popular websites
-that needs Javascript are using trackers like Google Analytics.
-
-Firefox users with Noscript can select
-which domain they want to allow to execute Javascripts.
-However, replicating this on Opera is complicated and way too much to me.
-
-Instead , i made this small blacklist that prohibit the more popular analytics.
-It affects files hosted by the Website as well. 
-
-It is affective against analysers like Google Analytics but 
-a bit less against analysers like Piwik where it is hosted by web hosters themselves.
-A Web hoster can avoid our blacklist by simply modifying the file name to something else.
-(Change piwik to pwik and it will go unblocked)
-
-However, doing this is generally a lot of work and most of them if not all don't do this.
-
-And that is why you should never allow Javascript on suspicious websites.
-
-Prohibiting 'Session:' protects users against
-tracking by third party HTTP authentication headers.
-
-*/
-
-var words = 
-[
-'piwik', 'analytics', 'analyser', 'awstats', 'clicktale', 
-'addthis', 'ads', 'omniture' ,
-'statcounter', 'doubleclick', 'quantserver', 
-'adzerk', 'gchq.co.uk',
-'scorecard', 'gstatic',
-'cloudflare','ad.','cpmstar','http://Session:','Session:',
-'www.google','//:google','opera-mini','91.203.99.36','91.203.99.16'
-];
 
 	if (once == 0){
 			/* Sets Proxy to default on Start-up*/
@@ -72,11 +30,6 @@ var words =
 					}
 			};
 	
-			/*
-				Spoof another User-agent (the one used by Tor Browser)
-				If Javascript is enabled, they can still know your real User-Agent
-				so watch out !
-			*/
 	
 			var requestFilter = {
 					urls: [ "<all_urls>" ]
@@ -96,15 +49,6 @@ var words =
 				return blockingResponse;
 			};
 			
-			
-			/*
-				Spoof another User-agent (For JonDO)
-				I had to give up JonDo support because :
-				- You can't disable cache memory (or at least, i don't know how to do it)
-				- There are no way like Firefox to disable proxy keep alive.
-				JonDo users could use this securely only if they only go to HTTPS websites.
-				Anyway, i will enable it when Opera and/or Google will change their minds again.
-			*/
 			var requestFilter_2 = {
 					urls: [ "<all_urls>" ]
 				},
@@ -224,7 +168,6 @@ var words =
 			/*
 			Safe Browsing is not Incognito mode.
 			Basically, it detects if a website is trying to use Javascript vulnerabilities for exemple.
-			However, it's largely ineffective and i think it connects to Opera/Google servers as well...
 			*/
 			
 			chrome.privacy.services.safeBrowsingEnabled.set({ value: false }, function(){});
@@ -260,22 +203,7 @@ var words =
 	
 	// Our function to block trackers and also some attacks
 	loop();
-	/*
-	What this does is to add a header.
 	
-	chrome.webRequest.onBeforeSendHeaders.addListener(
-    function(details) {
-        details.requestHeaders.push({name:"Encoding",value:"gzip, deflate"});
-        return {requestHeaders: details.requestHeaders};
-    },
-    {urls: ["<all_urls>"]},
-    ["requestHeaders", "blocking"]
-                      //^^^^^^^^
-	);
-	*/
-	
-	
-
 
 chrome.browserAction.onClicked.addListener(function(){		
 		proxy_mode = proxy_mode + 1;
@@ -302,28 +230,6 @@ chrome.browserAction.onClicked.addListener(function(){
 			};
 		chrome.browserAction.setBadgeText({ text: "Tor" });
 		}
-		else if (proxy_mode == 2) {
-			var config = { 
-				  mode: "fixed_servers",
-				  rules: {
-						proxyForHttps : {
-							scheme: "http",
-							host: "127.0.0.1",
-							port: 4001
-						},
-						proxyForHttp : {
-							scheme: "http",
-							host: "127.0.0.1",
-							port: 4001
-						},
-						proxyForFtp : {
-							host: "127.0.0.1",
-							port: 4001
-						}
-					}
-			};
-		chrome.browserAction.setBadgeText({ text: "JAP" });
-		}
 		
 		chrome.proxy.settings.set({value: config, scope: 'regular'});
 		// Needed in order to send our modified User-Agent to websites
@@ -334,89 +240,31 @@ function loop(){
 	/*
 	There are no way to disable the history
 	so our only way is to clear the history each time it is 'updated'.
-	This way, It never gets filed or even touched.
+	
 	*/
 			chrome.browsingData.remove({
 			"originTypes": { "unprotectedWeb": false , "protectedWeb": false }
 				}, 
 			{
-			"appcache": true,
+			"appcache": false,
 			"cache": true,
 			"cookies": false,
 			"downloads": true,
 			"fileSystems": false,
-			"formData": true,
+			"formData": false,
 			"history": true,
-			"indexedDB": true,
+			"indexedDB": false,
 			"localStorage": true,
 			"serverBoundCertificates": false,
-			"pluginData": true,
-			"passwords": true,
-			"webSQL": true
+			"pluginData": false,
+			"passwords": false,
+			"webSQL": false
 			});
 			
-			if (proxy_mode == 2) {
-				chrome.webRequest.onBeforeSendHeaders.addListener( handler_2, requestFilter_2, extraInfoSpec_2 );
-				}
-			else{
 				chrome.webRequest.onBeforeSendHeaders.addListener( handler, requestFilter, extraInfoSpec );
-			}
-
 				chrome.webRequest.onBeforeSendHeaders.addListener( change_encoding, requestFilter_6, extraInfoSpec_6 );
 				chrome.webRequest.onBeforeSendHeaders.addListener( change_language, requestFilter_4, extraInfoSpec_4 );
 				chrome.webRequest.onBeforeSendHeaders.addListener( change_content_types, requestFilter_5, extraInfoSpec_5 );
-				
-				
-			blockUrl();
 }
 
-
-function blockUrl(){
-/*
-I tried a for.. loop but it is ignored
-by the browser so i had to do this instead.
-
-	for (i=0;i<words.length;i++){
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[i]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		//alert(i);
-	}
-*/
-
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[0]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		
-
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[0]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[1]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[2]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[3]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[4]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[5]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[6]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[7]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[8]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[9]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[10]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[11]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[12]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[13]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[14]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[15]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[16]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[17]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[18]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[19]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[20]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[21]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[22]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[23]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[24]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[25]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[26]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[27]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[28]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[29]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-		chrome.webRequest.onBeforeRequest.addListener(function(details) {var hostname = details.url.split('/', 3)[2];return {cancel: hostname.indexOf(words[30]) >= 0};},{urls:[ "<all_urls>" ]},["blocking"]);
-
-		
-}
 
