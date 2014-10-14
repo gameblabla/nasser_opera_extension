@@ -9,12 +9,9 @@ KANOPE also protects you against some attacks like :
 Install it and then go to http://ip-check.info/ to see how much effective it is. <br>
 The only big problems are :  <br>
 - The order of HTTP headers is not same as Firefox/TorBrowser so the signature is different.
-- The referer is disabled but it can break some websites.
 - An attacker can indirectly know the fonts you have installed on your PC with @font-face.
 
-Modifying the referer to only send the current domain needs additional code 
-<br>(and i don't know how to do this),<br>
-the signature thingy can't be solved by an extension (only by Opera or Google) 
+The signature thingy can't be solved by an extension (only by Opera or Google) 
 <br>and blocking @font-face is possible but i have no idea how to do to this.<br>
 <br>
 It's my first extension for any browser. <br>
